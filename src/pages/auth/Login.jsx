@@ -1,0 +1,60 @@
+import { useState } from "react";
+import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { Form, Button, Card, Container, Alert } from "react-bootstrap";
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    // ✅ Store Supabase access token
+    login(data.session.access_token);
+    navigate("/admin");
+  };
+
+  return (
+    <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+      <Card className="p-4" style={{ width: "400px" }}>
+        <Card.Body>
+          <h2 className="text-center mb-4">Admin Login</h2>
+          {error && <Alert variant="danger">{error}</Alert>}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Password</Form.Label>
+              <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </Form.Group>
+            <Button type="submit" className="w-100">Login</Button>
+          </Form>
+          <div className="text-center mt-3">
+            <Link to="/register">Register</Link>
+          </div>
+        </Card.Body>
+      </Card>
+    </Container>
+  );
+};
+
+export default Login;

@@ -1,0 +1,55 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+/* 📱 Mobile Dashboard Optimizations */
+@media (max-width: 576px) {
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .card-body {
+    padding: 0.9rem;
+  }
+
+  canvas {
+    max-height: 220px !important;
+  }
+}
+/* ===== ADMIN SIDEBAR ===== */
+.admin-sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+}
+
+.admin-sidebar .nav-link {
+  color: #374151;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.admin-sidebar .nav-link.active {
+  background-color: #e7f1ff;
+  font-weight: 600;
+}
+
+/* MAIN CONTENT */
+.admin-content {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* 📱 MOBILE */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    display: none;
+  }
+}
