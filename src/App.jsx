@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-// We import the specific provider available in your version
-import { Provider, AppProvider } from "@shopify/app-bridge-react";
+import { Provider as AppBridgeProvider } from "@shopify/app-bridge-react";
 import { AuthProvider } from "./context/AuthContext";
 
 import Login from "./pages/auth/Login";
@@ -9,7 +8,7 @@ import FeedbackPage from "./pages/public/FeedbackPage";
 import ThankYouPage from "./pages/public/ThankYouPage";
 import Dashboard from "./pages/admin/Dashboard";
 import CreateShop from "./pages/admin/CreateShop";
-import EditShop from "./pages/admin/EditShop";
+import EditShop from "./pages/admin/CreateShop";
 import FeedbackList from "./pages/admin/FeedbackList";
 import ShopSettings from "./pages/admin/ShopSettings";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -24,14 +23,14 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<RootRedirect />} />
-          
-          {/* Public Routes */}
+
+          {/* Public */}
           <Route path="/feedback/:shopId" element={<FeedbackPage />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Admin Routes */}
+          {/* Admin (Embedded) */}
           <Route
             path="/admin/*"
             element={
@@ -59,45 +58,36 @@ function App() {
   );
 }
 
+/**
+ * ✅ CORRECT App Bridge Wrapper (v3 ONLY)
+ */
 function ShopifyAppBridgeWrapper({ children }) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const host = params.get("host") || window.localStorage.getItem("shopify_host");
+  const host =
+    params.get("host") || window.localStorage.getItem("shopify_host");
 
-  if (host) {
-    window.localStorage.setItem("shopify_host", host);
-    
-    // Handle API Key safely
-    const apiKey = import.meta.env.VITE_SHOPIFY_API_KEY;
-
-    // COMPATIBILITY FIX: Use the correct Provider based on what is available
-    // App Bridge v4 uses 'AppProvider', v3 uses 'Provider'
-    const ShopifyProvider = AppProvider || Provider;
-
-    if (!ShopifyProvider) {
-      return <div>Error: @shopify/app-bridge-react is missing or incompatible.</div>;
-    }
-
-    // Config for v3 (ignored by v4 usually, but harmless)
-    const config = {
-      apiKey: apiKey,
-      host: host,
-      forceRedirect: true,
-    };
-
-    // Render with both v3 props (config) and v4 props (apiKey) to be safe
+  if (!host) {
     return (
-        <ShopifyProvider config={config} apiKey={apiKey}>
-            {children}
-        </ShopifyProvider>
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        <p>App Bridge host missing.</p>
+        <p>Please open this app from Shopify Admin.</p>
+      </div>
     );
   }
 
+  window.localStorage.setItem("shopify_host", host);
+
+  const config = {
+    apiKey: import.meta.env.VITE_SHOPIFY_API_KEY,
+    host,
+    forceRedirect: true,
+  };
+
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <p>App Bridge Configuration Missing.</p>
-      <p>Please open this app via the Shopify Admin.</p>
-    </div>
+    <AppBridgeProvider config={config}>
+      {children}
+    </AppBridgeProvider>
   );
 }
 
