@@ -1,5 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { Provider as AppBridgeProvider } from "@shopify/app-bridge-react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { AppProvider } from "@shopify/app-bridge-react";
 import { AuthProvider } from "./context/AuthContext";
 
 import Login from "./pages/auth/Login";
@@ -8,7 +14,7 @@ import FeedbackPage from "./pages/public/FeedbackPage";
 import ThankYouPage from "./pages/public/ThankYouPage";
 import Dashboard from "./pages/admin/Dashboard";
 import CreateShop from "./pages/admin/CreateShop";
-import EditShop from "./pages/admin/CreateShop";
+import EditShop from "./pages/admin/EditShop";
 import FeedbackList from "./pages/admin/FeedbackList";
 import ShopSettings from "./pages/admin/ShopSettings";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -22,6 +28,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {/* Root */}
           <Route path="/" element={<RootRedirect />} />
 
           {/* Public */}
@@ -30,7 +37,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Admin (Embedded) */}
+          {/* Admin (Embedded Shopify App) */}
           <Route
             path="/admin/*"
             element={
@@ -59,11 +66,12 @@ function App() {
 }
 
 /**
- * ✅ CORRECT App Bridge Wrapper (v3 ONLY)
+ * ✅ CORRECT App Bridge v4 Wrapper
  */
 function ShopifyAppBridgeWrapper({ children }) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
+
   const host =
     params.get("host") || window.localStorage.getItem("shopify_host");
 
@@ -76,18 +84,19 @@ function ShopifyAppBridgeWrapper({ children }) {
     );
   }
 
+  // Persist host across navigation
   window.localStorage.setItem("shopify_host", host);
 
-  const config = {
-    apiKey: import.meta.env.VITE_SHOPIFY_API_KEY,
-    host,
-    forceRedirect: true,
-  };
+  const apiKey = import.meta.env.VITE_SHOPIFY_API_KEY;
+
+  if (!apiKey) {
+    return <div>Missing VITE_SHOPIFY_API_KEY</div>;
+  }
 
   return (
-    <AppBridgeProvider config={config}>
+    <AppProvider apiKey={apiKey} host={host} forceRedirect>
       {children}
-    </AppBridgeProvider>
+    </AppProvider>
   );
 }
 
