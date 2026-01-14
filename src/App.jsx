@@ -96,7 +96,6 @@ function ShopifyAppBridgeWrapper({ children }) {
 
     return <AppBridgeProvider config={config}>{children}</AppBridgeProvider>;
   }
-
   // If no host is found, show a message or redirect to login (if outside Shopify)
   return (
     <div style={{ padding: "20px", textAlign: "center" }}>
