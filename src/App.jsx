@@ -5,7 +5,7 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import { AppProvider } from "@shopify/app-bridge-react";
+import { Provider as AppBridgeProvider } from "@shopify/app-bridge-react";
 import { AuthProvider } from "./context/AuthContext";
 
 import Login from "./pages/auth/Login";
@@ -28,7 +28,6 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Root */}
           <Route path="/" element={<RootRedirect />} />
 
           {/* Public */}
@@ -37,7 +36,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Admin (Embedded Shopify App) */}
+          {/* Embedded Admin */}
           <Route
             path="/admin/*"
             element={
@@ -65,9 +64,6 @@ function App() {
   );
 }
 
-/**
- * ✅ CORRECT App Bridge v4 Wrapper
- */
 function ShopifyAppBridgeWrapper({ children }) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -77,26 +73,24 @@ function ShopifyAppBridgeWrapper({ children }) {
 
   if (!host) {
     return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <p>App Bridge host missing.</p>
-        <p>Please open this app from Shopify Admin.</p>
+      <div style={{ padding: 20, textAlign: "center" }}>
+        <p>App must be opened from Shopify Admin.</p>
       </div>
     );
   }
 
-  // Persist host across navigation
   window.localStorage.setItem("shopify_host", host);
 
-  const apiKey = import.meta.env.VITE_SHOPIFY_API_KEY;
-
-  if (!apiKey) {
-    return <div>Missing VITE_SHOPIFY_API_KEY</div>;
-  }
+  const config = {
+    apiKey: import.meta.env.VITE_SHOPIFY_API_KEY,
+    host,
+    forceRedirect: true,
+  };
 
   return (
-    <AppProvider apiKey={apiKey} host={host} forceRedirect>
+    <AppBridgeProvider config={config}>
       {children}
-    </AppProvider>
+    </AppBridgeProvider>
   );
 }
 

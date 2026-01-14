@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@shopify/app-bridge": "^3.7.11",
-    "@shopify/app-bridge-react": "^4.2.8",
+    "@shopify/app-bridge-react": "4.2.8",
     "@supabase/supabase-js": "^2.89.0",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
