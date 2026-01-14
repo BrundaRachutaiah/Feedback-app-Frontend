@@ -36,7 +36,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Embedded Admin */}
+          {/* Embedded Shopify Admin */}
           <Route
             path="/admin/*"
             element={
@@ -67,16 +67,11 @@ function App() {
 function ShopifyAppBridgeWrapper({ children }) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-
   const host =
     params.get("host") || window.localStorage.getItem("shopify_host");
 
   if (!host) {
-    return (
-      <div style={{ padding: 20, textAlign: "center" }}>
-        <p>App must be opened from Shopify Admin.</p>
-      </div>
-    );
+    return <div>Open this app from Shopify Admin.</div>;
   }
 
   window.localStorage.setItem("shopify_host", host);
