@@ -20,14 +20,16 @@ import AdminLayout from "./layouts/AdminLayout";
 import ShopAnalytics from "./pages/admin/ShopAnalytics";
 import GlobalAnalytics from "./pages/admin/GlobalAnalytics";
 
+import RootRedirect from "./routes/RootRedirect";
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
 
-          {/* ROOT */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* ROOT (SMART REDIRECT) */}
+          <Route path="/" element={<RootRedirect />} />
 
           {/* PUBLIC */}
           <Route path="/feedback/:shopId" element={<FeedbackPage />} />
